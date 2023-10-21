@@ -6,6 +6,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const app=express()
 const port=process.env.PORT ||5000;
 
+
 //middleware
 app.use(cors())
 app.use(express.json());
@@ -27,12 +28,23 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+const BrandData = client.db('brand-show').collection('dataforall');
 
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    
+
+    app.get('/dataforall/:name',async(req,res)=>{
+      const name=req.params.name;
+      const query={BrandName:{$eq :name}}
+      const result=await BrandData.find(query).toArray()
+      res.send(result)
+    
+    })
+    
 
 
 
@@ -51,6 +63,8 @@ run().catch(console.dir);
 app.get('/',(req,res)=>{
     res.send('brand server is running')
 })
+
+
 
 app.listen(port,()=>{
     console.log(`brands server is running ${port}`);
