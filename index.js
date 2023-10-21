@@ -29,6 +29,8 @@ const client = new MongoClient(uri, {
   }
 });
 const BrandData = client.db('brand-show').collection('dataforall');
+const useCollection=client.db('brand-show').collection('user')
+const useCollectiondes=client.db('brand-show').collection('userd')
 
 async function run() {
   try {
@@ -43,6 +45,23 @@ async function run() {
       const result=await BrandData.find(query).toArray()
       res.send(result)
     
+    })
+
+    app.get('/dataforall/:name',async(req,res)=>{
+      const name=req.params.name;
+      const query={BrandName:{$eq :name}}
+      const result=await BrandData.find(query).toArray()
+      res.send(result)
+    
+    })
+
+    // user related
+
+    app.post('/user',async(req,res)=>{
+      const user=req.body;
+      console.log(user);
+      const result=await useCollection.insertOne(user)
+      res.send(result);
     })
     
 
