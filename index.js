@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app=express()
 const port=process.env.PORT ||5000;
 
@@ -30,13 +30,19 @@ const client = new MongoClient(uri, {
 });
 const BrandData = client.db('brand-show').collection('dataforall');
 const useCollection=client.db('brand-show').collection('user')
-const useCollectiondes=client.db('brand-show').collection('userd')
+
 
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    app.post('/dataforall',async(req,res)=>{
+      const newbrand=req.body;
+      console.log(newbrand);
+      const result=await BrandData.insertOne(newbrand)
+      res.send(result)
+    })
     
 
     app.get('/dataforall/:name',async(req,res)=>{
@@ -46,15 +52,25 @@ async function run() {
       res.send(result)
     
     })
+    app.get('/dataforall/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={ID:new ObjectId(id)}
+      const result=await BrandData.findOne(query)
+      res.send(result);
+    
+    })
 
-    app.get('/dataforall/:name',async(req,res)=>{
-      const name=req.params.name;
-      const query={BrandName:{$eq :name}}
-      const result=await BrandData.find(query).toArray()
+    app.get('/dataforshow/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={ID:id}
+      const result=await BrandData.findOne(query)
       res.send(result)
     
     })
 
+   
+
+    
     // user related
 
     app.post('/user',async(req,res)=>{
