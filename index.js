@@ -30,6 +30,7 @@ const client = new MongoClient(uri, {
 });
 const BrandData = client.db('brand-show').collection('dataforall');
 const useCollection=client.db('brand-show').collection('user')
+const cardCollection=client.db('brand-show').collection('carddata')
 
 
 async function run() {
@@ -52,12 +53,32 @@ async function run() {
       res.send(result)
     
     })
-    app.get('/dataforall/:id',async(req,res)=>{
+    app.get('/dataforupdateall/:id',async(req,res)=>{
       const id=req.params.id;
-      const query={ID:new ObjectId(id)}
+      const query={ID:id}
       const result=await BrandData.findOne(query)
       res.send(result);
     
+    })
+    app.put('/dataforupdateall/:id',async(req,res)=>{
+      const id=req.params.id;
+      const filter={_id: new ObjectId(id)}
+      const options={ upsert :true}
+      const updatedata=req.body;
+       const branddata= {
+
+        $set:{
+          name :updatedata.name,
+          brand :updatedata.brand,
+          Type:updatedata.Type,
+          Price:updatedata.Price,
+          Rating:updatedata.Rating,
+          Image:updatedata.Image
+
+        }
+      }
+      const result=await BrandData.updateOne(filter, branddata,options)
+      res.send(result)
     })
 
     app.get('/dataforshow/:id',async(req,res)=>{
@@ -65,7 +86,18 @@ async function run() {
       const query={ID:id}
       const result=await BrandData.findOne(query)
       res.send(result)
-    
+    })
+
+    // card
+    app.post('/dataforcard',async(req,res)=>{
+      const newbrand=req.body;
+      console.log(newbrand);
+      const result=await cardCollection.insertOne(newbrand)
+      res.send(result)
+    })
+    app.get('/dataforcard',async(req,res)=>{
+      const result=await cardCollection.find().toArray()
+      res.send(result)
     })
 
    
